@@ -1,0 +1,134 @@
+jorimoloye@ollama:~/Desktop$ ollama run dolphin-mixtral
+>>> write a simple Kotlin application to be built with the Android Studio IDE.  T 
+... 
+... ... he app will let you input your first and last name.  Once you press enter,
+...  the
+... ...  app will display your name and play a quick 3 second melody.
+ Here's a simple Kotlin application for Android that takes user input for 
+their first and last names, then displays their full name and plays a 
+3-second sound:
+
+1. First, create a new project in Android Studio. Choose "Empty Activity" as
+the template and set it up according to the wizard's prompts.
+
+2. Open the `activity_main.xml` file under res/layout folder. Replace its 
+contents with this layout:
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <EditText
+        android:id="@+id/firstName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="First name"/>
+
+    <EditText
+        android:id="@+id/lastName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="Last name"/>
+
+    <Button
+        android:id="@+id/nameSubmit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Submit"/>
+
+    <TextView
+        android:id="@+id/displayName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp" />
+</LinearLayout>
+```
+
+3. Now, open the `MainActivity.kt` file under your main package (usually in 
+the top level). Replace its contents with this code:
+
+```kotlin
+package com.example.myapplication
+
+import androidx.appcompat.app.AppCompatActivity
+import android.os.Bundle
+import android.view.View
+import android.widget.Button
+import android.widget.EditText
+import android.widget.TextView
+import android.media.MediaPlayer
+
+class MainActivity : AppCompatActivity(), View.OnClickListener {
+    lateinit var firstName: EditText
+    lateinit var lastName: EditText
+    lateinit var displayName: TextView
+    lateinit var submitButton: Button
+    private val mediaPlayer = MediaPlayer()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        firstName = findViewById(R.id.firstName)
+        lastName = findViewById(R.id.lastName)
+        submitButton = findViewById(R.id.nameSubmit)
+        displayName = findViewById(R.id.displayName)
+
+        submitButton.setOnClickListener(this)
+    }
+
+    override fun onClick(v: View?) {
+        when (v?.id) {
+            R.id.nameSubmit -> {
+                val firstNameText = firstName.text.toString()
+                val lastNameText = lastName.text.toString()
+
+                if (firstNameText.isNotEmpty() && lastNameText.isNotEmpty())
+{
+                    displayName.text = "$firstNameText $lastNameText"
+                    playMelody(3)
+                } else {
+                    displayName.text = "Please enter your name."
+                }
+            }
+        }
+    }
+
+    private fun playMelody(duration: Int) {
+        mediaPlayer.release()
+        mediaPlayer.reset()
+        mediaPlayer.setDataSource(this, Uri.parse("android.resource://" + 
+packageName + "/" + R.raw.melody))
+        mediaPlayer.prepare()
+        mediaPlayer.start()
+
+        mediaPlayer.setOnCompletionListener {
+            mediaPlayer.release()
+        }
+
+        mediaPlayer.seekTo(0)
+        mediaPlayer.start()
+        mediaPlayer.setOnSeekCompleteListener {
+            it.release()
+        }
+
+        Thread.sleep(duration * 1000L)
+    }
+}
+```
+
+4. Create a new resource file by right-clicking the `res` folder, selecting 
+"New" -> "Directory", naming the directory "raw", and clicking "Finish". 
+Inside this "raw" directory, create a new file called "melody.mp3" or any 
+audio format you prefer to use (e.g., ".ogg", ".wav").
+
+5. Add your 3-second melody sound to this file. You can find and download 
+suitable files from various sources on the internet (e.g., freetuts.net, 
+freesound.org).
+
+6. Build and run the application using Android Studio's "Run" button or by 
+pressing Ctrl + R. The app should now prompt for your first and last name, 
+display it once you submit, and play a short melody.
